@@ -9,9 +9,7 @@ import axios from "../helpers.js";
 describe("GET /v2/polyfill.js", function() {
 	it("responds with valid javascript", async function() {
 		const response = await axios.get(`/v2/polyfill.js`, {
-			headers: {
-				"Fastly-debug": "true",
-			}
+			headers: {}
 		});
 		assert.equal(response.status, 200);
 		assert.match(response.headers['content-type'], /text\/javascript; charset=(utf|UTF)-8/)
@@ -24,9 +22,7 @@ describe("GET /v2/polyfill.js", function() {
 describe("GET /v2/polyfill.js?callback=AAA&callback=BBB", function() {
 	it("responds with valid javascript", async function() {
 		const response = await axios.get(`/v2/polyfill.js?callback=AAA&callback=BBB`, {
-			headers: {
-				"Fastly-debug": "true",
-			}
+			headers: {}
 		});
 		assert.equal(response.status, 200);
 		assert.match(response.headers['content-type'], /text\/javascript; charset=(utf|UTF)-8/)
@@ -39,9 +35,7 @@ describe("GET /v2/polyfill.js?callback=AAA&callback=BBB", function() {
 describe("GET /v2/polyfill.min.js", function() {
 	it("responds with valid javascript", async function() {
 		const response = await axios.get(`/v2/polyfill.min.js`, {
-			headers: {
-				"Fastly-debug": "true",
-			}
+			headers: {}
 		});
 		assert.equal(response.status, 200);
 		assert.match(response.headers['content-type'], /text\/javascript; charset=(utf|UTF)-8/)
@@ -54,9 +48,7 @@ describe("GET /v2/polyfill.min.js", function() {
 describe("GET /v2/polyfill.js?features=all&ua=non-existent-ua&unknown=polyfill&flags=gated&rum=1", function() {
 	it("responds with valid javascript", async function() {
 		const response = await axios.get(`/v2/polyfill.js?features=all&ua=non-existent-ua&unknown=polyfill&flags=gated&rum=1`, {
-			headers: {
-				"Fastly-debug": "true",
-			}
+			headers: {}
 		});
 		assert.equal(response.status, 200);
 		assert.match(response.headers['content-type'], /text\/javascript; charset=(utf|UTF)-8/)
@@ -70,9 +62,7 @@ describe("GET /v2/polyfill.js?features=all&ua=non-existent-ua&unknown=polyfill&f
 describe("GET /v2/polyfill.min.js?features=all&ua=non-existent-ua&unknown=polyfill&flags=gated&rum=1", function() {
 	it("responds with valid javascript", async function() {
 		const response = await axios.get(`/v2/polyfill.min.js?features=all&ua=non-existent-ua&unknown=polyfill&flags=gated&rum=1`, {
-			headers: {
-				"Fastly-debug": "true",
-			}
+			headers: {}
 		});
 		assert.equal(response.status, 200);
 		assert.match(response.headers['content-type'], /text\/javascript; charset=(utf|UTF)-8/)
