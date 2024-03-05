@@ -9,9 +9,7 @@ import axios from "../helpers.js";
 describe("GET /v1/polyfill.js", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v1/polyfill.js`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -36,9 +34,7 @@ describe("GET /v1/polyfill.js", function() {
 describe("GET /v1/polyfill.js?features=default&libVersion=1&gated=true", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v1/polyfill.js?features=default&libVersion=1&gated=true`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -63,9 +59,7 @@ describe("GET /v1/polyfill.js?features=default&libVersion=1&gated=true", functio
 describe("GET /v1/polyfill.min.js", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v1/polyfill.min.js`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -90,9 +84,7 @@ describe("GET /v1/polyfill.min.js", function() {
 describe("GET /v1/polyfill.min.js?features=default&libVersion=1&gated=true", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v1/polyfill.min.js?features=default&libVersion=1&gated=true`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 

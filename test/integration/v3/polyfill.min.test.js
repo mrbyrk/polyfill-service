@@ -9,9 +9,7 @@ import axios from "../helpers.js";
 describe("GET /v3/polyfill.js", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v3/polyfill.js`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -36,9 +34,7 @@ describe("GET /v3/polyfill.js", function() {
 describe("GET /v3/polyfill.js?features=carrot&strict", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v3/polyfill.js?features=carrot&strict`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -63,9 +59,7 @@ describe("GET /v3/polyfill.js?features=carrot&strict", function() {
 describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v3/polyfill.js?callback=AAA&callback=BBB`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -91,7 +85,6 @@ describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 // 	it("responds with no compression if client does not accept compressed responses", async () => {
 // 		const response = await axios.get(`/v3/polyfill.js`, {
 // 			headers: {
-// 				"Fastly-Debug": "true",
 // 				"Accept-Encoding": "identity"
 // 			}
 // 		});
@@ -104,7 +97,6 @@ describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 // 	it("responds with gzip compression if client accepts gzip compressed responses", async() => {
 // 		const response = await axios.get(`/v3/polyfill.js`, {
 // 			headers: {
-// 				"Fastly-Debug": "true",
 // 				"Accept-Encoding": "gzip"
 // 			}
 // 		});
@@ -117,7 +109,6 @@ describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 // 	it("responds with gzip compression if client accepts gzip and deflate compressed responses", async () => {
 // 		const response = await axios.get(`/v3/polyfill.js`, {
 // 			headers: {
-// 				"Fastly-Debug": "true",
 // 				"Accept-Encoding": "gzip, deflate"
 // 			}
 // 		});
@@ -130,7 +121,6 @@ describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 // 	it("responds with brotli compression if client accepts brotli compressed responses", async () => {
 // 		const response = await axios.get(`/v3/polyfill.js`, {
 // 			headers: {
-// 				"Fastly-Debug": "true",
 // 				"Accept-Encoding": "br"
 // 			}
 // 		});
@@ -143,7 +133,6 @@ describe("GET /v3/polyfill.js?callback=AAA&callback=BBB", function() {
 // 	it("responds with brotli compression if client accepts brotli and gzip compressed responses", async () => {
 // 		const response = await axios.get(`/v3/polyfill.js`, {
 // 			headers: {
-// 				"Fastly-Debug": "true",
 // 				"Accept-Encoding": "br, gzip"
 // 			}
 // 		});
@@ -180,9 +169,7 @@ describe("DELETE /v3/polyfill.min.js", function() {
 describe("GET /v3/polyfill.min.js", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v3/polyfill.min.js`, {
-			headers: {
-				"Fastly-Debug": "true"
-			},
+			headers: {},
 			decompress: true
 		});
 
@@ -209,7 +196,6 @@ describe("GET /v3/polyfill.min.js?callback=AAA&callback=BBB", function() {
 	it("responds with a 200 status", async () => {
 		const response = await axios.get(`/v3/polyfill.min.js?callback=AAA&callback=BBB`, {
 			headers: {
-				"Fastly-Debug": "true",
 				"Accept-Encoding": "identity"
 			},
 			decompress: true
