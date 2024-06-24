@@ -16,15 +16,27 @@ type BoxError = Box<dyn std::error::Error>;
 
 const D1_RETRIES: usize = 10;
 
-pub(crate) fn lookup_file(n: &str) -> Result<Option<Buffer>, BoxError> {
+pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxError> {
     if n.ends_with("/meta.json") {
-        return Ok(meta::lookup(n).map(Buffer::from_str));
+        return match version {
+            "3.111.0" => Ok(meta::lookup_3_111_0(n).map(Buffer::from_str)),
+            v => {
+                worker::console_warn!("no meta database for version {v}");
+                Ok(None)
+            }
+        };
     }
 
     if n == "/aliases.json" {
-        return Ok(Some(Buffer::from_str(include_str!(
-            "../../polyfill-libraries/3.111.0/aliases.json"
-        ))));
+        return match version {
+            "3.111.0" => Ok(Some(Buffer::from_str(include_str!(
+                "../../polyfill-libraries/3.111.0/aliases.json"
+            )))),
+            v => {
+                worker::console_warn!("no aliases for version {v}");
+                Ok(None)
+            }
+        };
     }
 
     worker::console_warn!("lookup {n}: not found");
@@ -59,8 +71,8 @@ struct PolyfillConfig {
     detect_source: Option<String>,
 }
 
-fn lookup(key: &str) -> Option<Vec<u8>> {
-    let value = lookup_file(key);
+fn lookup(version: &str, key: &str) -> Option<Vec<u8>> {
+    let value = lookup_file(version, key);
     let mut value = match value {
         Err(_) | Ok(None) => return None,
         Ok(Some(value)) => value,
@@ -73,11 +85,11 @@ fn lookup(key: &str) -> Option<Vec<u8>> {
     }
 }
 
-fn get_polyfill_meta(feature_name: &str) -> Option<PolyfillConfig> {
+fn get_polyfill_meta(version: &str, feature_name: &str) -> Option<PolyfillConfig> {
     if feature_name.is_empty() {
         return None;
     }
-    let meta = lookup(&format!("/{feature_name}/meta.json"));
+    let meta = lookup(version, &format!("/{feature_name}/meta.json"));
     let meta = match meta {
         None => return None,
         Some(meta) => meta,
@@ -85,11 +97,11 @@ fn get_polyfill_meta(feature_name: &str) -> Option<PolyfillConfig> {
     serde_json::from_slice(&meta).unwrap()
 }
 
-fn get_config_aliases(alias: &str) -> Option<Vec<String>> {
+fn get_config_aliases(version: &str, alias: &str) -> Option<Vec<String>> {
     if alias.is_empty() {
         return None;
     }
-    lookup(&format!("/aliases.json")).and_then(|bytes| {
+    lookup(version, &format!("/aliases.json")).and_then(|bytes| {
         let aliases = serde_json::from_slice::<HashMap<String, Vec<String>>>(&bytes)
             .map_err(|e| {
                 panic!(
@@ -224,8 +236,8 @@ fn get_polyfills(
             };
 
             // Handle alias logic here
-            let alias =
-                get_config_aliases(&feature_name).map_or_else(Default::default, |alias| alias);
+            let alias = get_config_aliases(version, &feature_name)
+                .map_or_else(Default::default, |alias| alias);
 
             if !alias.is_empty() {
                 feature_names.remove(&feature_name);
@@ -256,7 +268,7 @@ fn get_polyfills(
                 }
             }
 
-            let Some(meta) = get_polyfill_meta(&feature_name) else {
+            let Some(meta) = get_polyfill_meta(version, &feature_name) else {
                 feature_names.remove(&feature_name);
                 if add_feature(
                     &feature_name,
@@ -346,14 +358,14 @@ pub async fn get_polyfill_string_stream(
     let app_version_text = "Polyfill service v".to_owned() + app_version;
     let mut explainer_comment: Vec<String> = vec![];
     // Build a polyfill bundle of polyfill sources sorted in dependency order
-    let mut targeted_features = get_polyfills(options, "3.111.0");
+    let mut targeted_features = get_polyfills(options, app_version);
     let mut warnings: Vec<String> = vec![];
     let mut feature_nodes: Vec<String> = vec![];
     let mut feature_edges: Vec<(String, String)> = vec![];
 
     let t = targeted_features.clone();
     for (feature_name, feature) in &mut targeted_features {
-        let polyfill = get_polyfill_meta(feature_name);
+        let polyfill = get_polyfill_meta(app_version, feature_name);
         match polyfill {
             Some(polyfill) => {
                 feature_nodes.push(feature_name.to_string());
@@ -382,7 +394,8 @@ pub async fn get_polyfill_string_stream(
     let m = if options.minify { "min" } else { "raw" };
     let mut sorted_features_bb = vec![];
 
-    let polyfill_sources = polyfill_sources(Arc::clone(&env), &sorted_features, m).await?;
+    let polyfill_sources =
+        polyfill_sources(Arc::clone(&env), &sorted_features, m, app_version).await?;
 
     for feature_name in &sorted_features {
         sorted_features_bb.push((
@@ -439,7 +452,7 @@ pub async fn get_polyfill_string_stream(
         for (feature_name, bb) in sorted_features_bb {
             let wrap_in_detect = targeted_features[feature_name].flags.contains("gated");
             if wrap_in_detect {
-                let meta = get_polyfill_meta(feature_name);
+                let meta = get_polyfill_meta(app_version, feature_name);
                 if let Some(meta) = meta {
                     if let Some(detect_source) = meta.detect_source {
                         if detect_source.is_empty() {
@@ -499,6 +512,7 @@ async fn polyfill_sources(
     env: Arc<Env>,
     feature_names: &[String],
     format: &str,
+    version: &str,
 ) -> Result<HashMap<String, Buffer>, BoxError> {
     let params = feature_names
         .iter()
@@ -508,7 +522,7 @@ async fn polyfill_sources(
     let params = wasm_bindgen::JsValue::from_str(&params);
 
     for i in 0..D1_RETRIES {
-        match fetch_polyfill_sources(Arc::clone(&env), &params).await {
+        match fetch_polyfill_sources(Arc::clone(&env), version, &params).await {
             Ok(d1_res) => {
                 if d1_res.success() {
                     let mut sources = HashMap::new();
@@ -540,17 +554,19 @@ async fn polyfill_sources(
 
 async fn fetch_polyfill_sources(
     env: Arc<Env>,
+    version: &str,
     params: &wasm_bindgen::JsValue,
 ) -> Result<worker::D1Result, BoxError> {
-    let stmt = env.polyfill_store.prepare(
+    let safe_version = version.replace(".", "_");
+    let stmt = env.polyfill_store.prepare(format!(
         r#"
               SELECT
                   name,
                   cast(value as char) as value
-              FROM files
+              FROM files_{safe_version}
               WHERE name IN (SELECT value FROM json_each(?))
-        "#,
-    );
+        "#
+    ));
 
     stmt.bind(&[params.to_owned()])?
         .all()
