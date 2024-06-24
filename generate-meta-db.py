@@ -43,3 +43,4 @@ def generate_version(version):
 
 
 generate_version("3.111.0")
+generate_version("4.8.0")
