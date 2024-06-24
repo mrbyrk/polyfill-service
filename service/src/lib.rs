@@ -44,9 +44,6 @@ pub async fn handle_request(
     let path = req.path();
     match path.as_str() {
         "/" => {
-            // worker::Response::from_status(StatusCode::PERMANENT_REDIRECT)
-            // .with_header("Location", "/v3/")
-            // .with_header("Cache-Control", "public, s-maxage=31536000, max-age=604800, stale-while-revalidate=604800, stale-if-error=604800, immutable").send_to_client();
             let mut headers = worker::Headers::new();
 
             headers.set("content-type", "text/html; charset=utf-8")?;
@@ -81,77 +78,6 @@ pub async fn handle_request(
         "/robots.txt" => {
             return worker::Response::ok("User-agent: *\nDisallow:");
         }
-        // "/v1" => {
-        //     worker::Response::from_status(StatusCode::PERMANENT_REDIRECT)
-        //         .with_header("Location", "/v3/")
-        //         .with_header("Cache-Control", "public, s-maxage=31536000, max-age=604800, stale-while-revalidate=604800, stale-if-error=604800, immutable").send_to_client();
-        // }
-        // "/v3/json/library-3.101.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.101.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.103.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.103.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.104.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.104.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.108.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.108.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.109.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.109.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.110.1.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.110.1.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
         "/v3/json/library-3.111.0.json" => {
             let mut headers = worker::Headers::new();
             headers.set("content-type", APPLICATION_JSON)?;
@@ -167,222 +93,22 @@ pub async fn handle_request(
                     .with_headers(headers),
             );
         }
-        // "/v3/json/library-3.27.4.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.27.4.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.34.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.34.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.39.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.39.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.40.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.40.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.41.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.41.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.42.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.42.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.46.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.46.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.48.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.48.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.50.2.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.50.2.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.51.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.51.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.52.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.52.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.52.1.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.52.1.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.52.2.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.52.2.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.52.3.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.52.3.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.53.1.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.53.1.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.89.4.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.89.4.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.96.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.96.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
-        // "/v3/json/library-3.98.0.json" => {
-        //     worker::Response::from_body(include_str!("json/library-3.98.0.json"))
-        //         .with_content_type(fastly::mime::APPLICATION_JSON)
-        //         .with_header("x-compress-hint", "on")
-        //         .with_header("surrogate-key", "website")
-        //         .with_header(
-        //             "Cache-Control",
-        //             "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-        //         )
-        //         .send_to_client();
-        // }
+        "/v3/json/library-4.8.0.json" => {
+            let mut headers = worker::Headers::new();
+            headers.set("content-type", APPLICATION_JSON)?;
+            headers.set("x-compress-hint", "on")?;
+            headers.set("surrogate-key", "website")?;
+            headers.set(
+                "Cache-Control",
+                "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
+            )?;
+
+            return Ok(
+                worker::Response::ok(include_str!("json/library-4.8.0.json"))?
+                    .with_headers(headers),
+            );
+        }
         _ => {
-            // if path.starts_with("/v1/") {
-            //     req.set_path(&(String::from("/v2") + &path[3..]));
-            //     path = req.get_path().to_owned();
-            // }
-            // if path == "/v2/polyfill.js" || path == "/v2/polyfill.min.js" {
-            //     req.set_path(&(String::from("/v3") + &path[3..]));
-
-            //     let mut search_params: HashMap<String, String> =
-            //         req.get_query().unwrap_or_default();
-            //     search_params.insert("version".to_owned(), "3.25.1".to_owned());
-            //     if !search_params.contains_key("unknown") {
-            //         search_params.insert("unknown".to_owned(), "ignore".to_owned());
-            //     }
-            //     req.set_query(&search_params).unwrap();
-            //     path = req.get_path().to_owned();
-            // }
-
             if path == "/v3/polyfill.min.js" || path == "/v3/polyfill.js" {
                 polyfill(&req, env).await
             } else {
