@@ -47,7 +47,7 @@ const defaultPolyfillBundleOptions = {
 	rum: 0,
 	features: [],
 	callback: "",
-	version: ""
+	version: "4.8.0"
 };
 
 const polyfillBundleOptions = Object.assign({}, defaultPolyfillBundleOptions);
