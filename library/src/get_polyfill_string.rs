@@ -20,6 +20,7 @@ pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxE
     if n.ends_with("/meta.json") {
         return match version {
             "3.111.0" => Ok(meta::lookup_3_111_0(n).map(Buffer::from_str)),
+            "4.8.0" => Ok(meta::lookup_4_8_0(n).map(Buffer::from_str)),
             v => {
                 worker::console_warn!("no meta database for version {v}");
                 Ok(None)
@@ -31,6 +32,9 @@ pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxE
         return match version {
             "3.111.0" => Ok(Some(Buffer::from_str(include_str!(
                 "../../polyfill-libraries/3.111.0/aliases.json"
+            )))),
+            "4.8.0" => Ok(Some(Buffer::from_str(include_str!(
+                "../../polyfill-libraries/4.8.0/aliases.json"
             )))),
             v => {
                 worker::console_warn!("no aliases for version {v}");
