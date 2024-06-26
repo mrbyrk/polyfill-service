@@ -15,6 +15,7 @@ fn parse_library_version(version: &str) -> Option<String> {
     if SUPPORTED_VERSIONS.contains(&version) {
         Some(version.to_owned())
     } else {
+        worker::console_warn!("unknown version: {version}, using fallback.");
         Some("3.111.0".to_owned()) // fallback to default version
     }
 }
@@ -47,6 +48,7 @@ pub(crate) async fn polyfill(
     // may update itself to a version which needs different polyfills
     // So we need to have it ignore the browser cached bundle when the user-agent changes.
     headers.set("Vary", "User-Agent, Accept-Encoding")?;
+    headers.set("Cf-Polyfill-Version", &version)?;
     let mut res_body = Buffer::new();
 
     get_polyfill_string_stream(&mut res_body, &parameters, env, &version)
