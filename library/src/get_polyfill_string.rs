@@ -60,6 +60,7 @@ pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxE
             "3.89.4" => lookup_file!(lookup_3_89_4, n),
             "3.96.0" => lookup_file!(lookup_3_96_0, n),
             "3.98.0" => lookup_file!(lookup_3_98_0, n),
+            "3.25.1" => lookup_file!(lookup_3_25_1, n),
             "4.8.0" => lookup_file!(lookup_4_8_0, n),
 
             v => {
@@ -97,6 +98,7 @@ pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxE
             "3.96.0" => get_alias!("3.96.0"),
             "3.98.0" => get_alias!("3.98.0"),
             "4.8.0" => get_alias!("4.8.0"),
+            "3.25.1" => get_alias!("3.25.1"),
 
             v => {
                 worker::console_warn!("no aliases for version {v}");
