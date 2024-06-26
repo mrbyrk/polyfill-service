@@ -5,6 +5,7 @@ mod polyfill;
 
 use crate::polyfill::polyfill;
 use pages::home;
+use std::collections::HashMap;
 use std::str;
 use std::sync::Arc;
 
@@ -176,9 +177,39 @@ pub async fn handle_request(
         }
 
         _ => {
-            // FIXME: add v4
+            if path == "/v2/polyfill.js" || path == "/v2/polyfill.min.js" {
+                let mut url = req
+                    .url()
+                    .map_err(|err| worker::Error::RustError(format!("failed to get URL: {err}")))?;
 
-            if path == "/v3/polyfill.min.js" || path == "/v3/polyfill.js" {
+                url.set_path(&(String::from("/v3") + &path[3..]));
+                url.query_pairs_mut().append_pair("version", "3.25.1");
+
+                let search_params = url
+                    .query_pairs()
+                    .into_owned()
+                    .collect::<HashMap<String, String>>();
+
+                if !search_params.contains_key("unknown") {
+                    url.query_pairs_mut().append_pair("unknown", "ignore");
+                }
+
+                let req_init = worker::RequestInit {
+                    body: None,
+                    headers: req.headers().clone(),
+                    cf: worker::CfProperties::default(),
+                    method: req.method(),
+                    redirect: worker::RequestRedirect::Follow,
+                };
+                let req2 =
+                    worker::Request::new_with_init(&url.to_string(), &req_init).map_err(|err| {
+                        worker::Error::RustError(format!("failed to build new request: {err}"))
+                    })?;
+
+                polyfill(&req2, env).await
+            }
+            // FIXME: add v4
+            else if path == "/v3/polyfill.min.js" || path == "/v3/polyfill.js" {
                 polyfill(&req, env).await
             } else {
                 let mut headers = worker::Headers::new();
