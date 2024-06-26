@@ -15,7 +15,7 @@ fn parse_library_version(version: &str) -> Option<String> {
     if SUPPORTED_VERSIONS.contains(&version) {
         Some(version.to_owned())
     } else {
-        None
+        Some("3.111.0".to_owned()) // fallback to default version
     }
 }
 
@@ -25,7 +25,7 @@ pub(crate) async fn polyfill(
 ) -> worker::Result<worker::Response> {
     let parameters = get_polyfill_parameters(request);
 
-    let _library = match parse_library_version(&parameters.version) {
+    let version = match parse_library_version(&parameters.version) {
         Some(library) => library,
         None => {
             let mut headers = worker::Headers::new();
@@ -37,7 +37,6 @@ pub(crate) async fn polyfill(
             );
         }
     };
-    let version = parameters.version.clone();
     let mut headers = worker::Headers::new();
     headers.set("Access-Control-Allow-Origin", "*")?;
     headers.set("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS")?;
