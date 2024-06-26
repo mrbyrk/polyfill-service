@@ -12,6 +12,21 @@ pub use polyfill_library::Env;
 
 const APPLICATION_JSON: &str = "application/json";
 
+macro_rules! library_json {
+    ( $file:expr ) => {{
+        let mut headers = worker::Headers::new();
+        headers.set("content-type", APPLICATION_JSON)?;
+        headers.set("x-compress-hint", "on")?;
+        headers.set("surrogate-key", "website")?;
+        headers.set(
+            "Cache-Control",
+            "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
+        )?;
+
+        return Ok(worker::Response::ok(include_str!($file))?.with_headers(headers));
+    }};
+}
+
 pub async fn handle_request(
     req: worker::Request,
     env: Arc<Env>,
@@ -78,37 +93,91 @@ pub async fn handle_request(
         "/robots.txt" => {
             return worker::Response::ok("User-agent: *\nDisallow:");
         }
+
+        "/v3/json/library-3.101.0.json" => {
+            library_json!("json/library-3.101.0.json")
+        }
+        "/v3/json/library-3.103.0.json" => {
+            library_json!("json/library-3.103.0.json")
+        }
+        "/v3/json/library-3.104.0.json" => {
+            library_json!("json/library-3.104.0.json")
+        }
+        "/v3/json/library-3.108.0.json" => {
+            library_json!("json/library-3.108.0.json")
+        }
+        "/v3/json/library-3.109.0.json" => {
+            library_json!("json/library-3.109.0.json")
+        }
+        "/v3/json/library-3.110.1.json" => {
+            library_json!("json/library-3.110.1.json")
+        }
         "/v3/json/library-3.111.0.json" => {
-            let mut headers = worker::Headers::new();
-            headers.set("content-type", APPLICATION_JSON)?;
-            headers.set("x-compress-hint", "on")?;
-            headers.set("surrogate-key", "website")?;
-            headers.set(
-                "Cache-Control",
-                "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-            )?;
-
-            return Ok(
-                worker::Response::ok(include_str!("json/library-3.111.0.json"))?
-                    .with_headers(headers),
-            );
+            library_json!("json/library-3.111.0.json")
         }
+        "/v3/json/library-3.27.4.json" => {
+            library_json!("json/library-3.27.4.json")
+        }
+        "/v3/json/library-3.34.0.json" => {
+            library_json!("json/library-3.34.0.json")
+        }
+        "/v3/json/library-3.39.0.json" => {
+            library_json!("json/library-3.39.0.json")
+        }
+        "/v3/json/library-3.40.0.json" => {
+            library_json!("json/library-3.40.0.json")
+        }
+        "/v3/json/library-3.41.0.json" => {
+            library_json!("json/library-3.41.0.json")
+        }
+        "/v3/json/library-3.42.0.json" => {
+            library_json!("json/library-3.42.0.json")
+        }
+        "/v3/json/library-3.46.0.json" => {
+            library_json!("json/library-3.46.0.json")
+        }
+        "/v3/json/library-3.48.0.json" => {
+            library_json!("json/library-3.48.0.json")
+        }
+        "/v3/json/library-3.50.2.json" => {
+            library_json!("json/library-3.50.2.json")
+        }
+        "/v3/json/library-3.51.0.json" => {
+            library_json!("json/library-3.51.0.json")
+        }
+        "/v3/json/library-3.52.0.json" => {
+            library_json!("json/library-3.52.0.json")
+        }
+        "/v3/json/library-3.52.1.json" => {
+            library_json!("json/library-3.52.1.json")
+        }
+        "/v3/json/library-3.52.2.json" => {
+            library_json!("json/library-3.52.2.json")
+        }
+        "/v3/json/library-3.52.3.json" => {
+            library_json!("json/library-3.52.3.json")
+        }
+        "/v3/json/library-3.53.1.json" => {
+            library_json!("json/library-3.53.1.json")
+        }
+        "/v3/json/library-3.89.4.json" => {
+            library_json!("json/library-3.89.4.json")
+        }
+        "/v3/json/library-3.96.0.json" => {
+            library_json!("json/library-3.96.0.json")
+        }
+        "/v3/json/library-3.98.0.json" => {
+            library_json!("json/library-3.98.0.json")
+        }
+
+        // FIXME: should be v4
         "/v3/json/library-4.8.0.json" => {
-            let mut headers = worker::Headers::new();
-            headers.set("content-type", APPLICATION_JSON)?;
-            headers.set("x-compress-hint", "on")?;
-            headers.set("surrogate-key", "website")?;
-            headers.set(
-                "Cache-Control",
-                "max-age=86400, stale-while-revalidate=86400, stale-if-error=86400",
-            )?;
-
-            return Ok(
-                worker::Response::ok(include_str!("json/library-4.8.0.json"))?
-                    .with_headers(headers),
-            );
+            library_json!("json/library-4.8.0.json")
         }
+
         _ => {
+            // FIXME: add v4
+
             if path == "/v3/polyfill.min.js" || path == "/v3/polyfill.js" {
                 polyfill(&req, env).await
             } else {

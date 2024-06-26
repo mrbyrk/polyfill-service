@@ -102,6 +102,30 @@ pub(crate) fn home() -> String {
                         select id="library-version" {
                             option value="4.8.0" selected="" {"4.8.0";}
                             option value="3.111.0" {"3.111.0";}
+                            option value="3.101.0" {"3.101.0";}
+                            option value="3.103.0" {"3.103.0";}
+                            option value="3.104.0" {"3.104.0";}
+                            option value="3.108.0" {"3.108.0";}
+                            option value="3.109.0" {"3.109.0";}
+                            option value="3.110.1" {"3.110.1";}
+                            option value="3.27.4"  {"3.27.4";}
+                            option value="3.34.0"  {"3.34.0";}
+                            option value="3.39.0"  {"3.39.0";}
+                            option value="3.40.0"  {"3.40.0";}
+                            option value="3.41.0"  {"3.41.0";}
+                            option value="3.42.0"  {"3.42.0";}
+                            option value="3.46.0"  {"3.46.0";}
+                            option value="3.48.0"  {"3.48.0";}
+                            option value="3.50.2"  {"3.50.2";}
+                            option value="3.51.0"  {"3.51.0";}
+                            option value="3.52.0"  {"3.52.0";}
+                            option value="3.52.1"  {"3.52.1";}
+                            option value="3.52.2"  {"3.52.2";}
+                            option value="3.52.3"  {"3.52.3";}
+                            option value="3.53.1"  {"3.53.1";}
+                            option value="3.89.4"  {"3.89.4";}
+                            option value="3.96.0"  {"3.96.0";}
+                            option value="3.98.0"  {"3.98.0";}
                         }
                     }
 

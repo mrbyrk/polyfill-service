@@ -16,11 +16,52 @@ type BoxError = Box<dyn std::error::Error>;
 
 const D1_RETRIES: usize = 10;
 
+macro_rules! lookup_file {
+    ( $fn:ident, $file:expr ) => {{
+        Ok(meta::$fn($file).map(Buffer::from_str))
+    }};
+}
+
+macro_rules! get_alias {
+    ( $version:expr ) => {{
+        Ok(Some(Buffer::from_str(include_str!(concat!(
+            "../../polyfill-libraries/",
+            $version,
+            "/aliases.json"
+        )))))
+    }};
+}
+
 pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxError> {
     if n.ends_with("/meta.json") {
         return match version {
-            "3.111.0" => Ok(meta::lookup_3_111_0(n).map(Buffer::from_str)),
-            "4.8.0" => Ok(meta::lookup_4_8_0(n).map(Buffer::from_str)),
+            "3.101.0" => lookup_file!(lookup_3_101_0, n),
+            "3.103.0" => lookup_file!(lookup_3_103_0, n),
+            "3.104.0" => lookup_file!(lookup_3_104_0, n),
+            "3.108.0" => lookup_file!(lookup_3_108_0, n),
+            "3.109.0" => lookup_file!(lookup_3_109_0, n),
+            "3.110.1" => lookup_file!(lookup_3_110_1, n),
+            "3.111.0" => lookup_file!(lookup_3_111_0, n),
+            "3.27.4" => lookup_file!(lookup_3_27_4, n),
+            "3.34.0" => lookup_file!(lookup_3_34_0, n),
+            "3.39.0" => lookup_file!(lookup_3_39_0, n),
+            "3.40.0" => lookup_file!(lookup_3_40_0, n),
+            "3.41.0" => lookup_file!(lookup_3_41_0, n),
+            "3.42.0" => lookup_file!(lookup_3_42_0, n),
+            "3.46.0" => lookup_file!(lookup_3_46_0, n),
+            "3.48.0" => lookup_file!(lookup_3_48_0, n),
+            "3.50.2" => lookup_file!(lookup_3_50_2, n),
+            "3.51.0" => lookup_file!(lookup_3_51_0, n),
+            "3.52.0" => lookup_file!(lookup_3_52_0, n),
+            "3.52.1" => lookup_file!(lookup_3_52_1, n),
+            "3.52.2" => lookup_file!(lookup_3_52_2, n),
+            "3.52.3" => lookup_file!(lookup_3_52_3, n),
+            "3.53.1" => lookup_file!(lookup_3_53_1, n),
+            "3.89.4" => lookup_file!(lookup_3_89_4, n),
+            "3.96.0" => lookup_file!(lookup_3_96_0, n),
+            "3.98.0" => lookup_file!(lookup_3_98_0, n),
+            "4.8.0" => lookup_file!(lookup_4_8_0, n),
+
             v => {
                 worker::console_warn!("no meta database for version {v}");
                 Ok(None)
@@ -30,12 +71,33 @@ pub(crate) fn lookup_file(version: &str, n: &str) -> Result<Option<Buffer>, BoxE
 
     if n == "/aliases.json" {
         return match version {
-            "3.111.0" => Ok(Some(Buffer::from_str(include_str!(
-                "../../polyfill-libraries/3.111.0/aliases.json"
-            )))),
-            "4.8.0" => Ok(Some(Buffer::from_str(include_str!(
-                "../../polyfill-libraries/4.8.0/aliases.json"
-            )))),
+            "3.101.0" => get_alias!("3.101.0"),
+            "3.103.0" => get_alias!("3.103.0"),
+            "3.104.0" => get_alias!("3.104.0"),
+            "3.108.0" => get_alias!("3.108.0"),
+            "3.109.0" => get_alias!("3.109.0"),
+            "3.110.1" => get_alias!("3.110.1"),
+            "3.111.0" => get_alias!("3.111.0"),
+            "3.27.4" => get_alias!("3.27.4"),
+            "3.34.0" => get_alias!("3.34.0"),
+            "3.39.0" => get_alias!("3.39.0"),
+            "3.40.0" => get_alias!("3.40.0"),
+            "3.41.0" => get_alias!("3.41.0"),
+            "3.42.0" => get_alias!("3.42.0"),
+            "3.46.0" => get_alias!("3.46.0"),
+            "3.48.0" => get_alias!("3.48.0"),
+            "3.50.2" => get_alias!("3.50.2"),
+            "3.51.0" => get_alias!("3.51.0"),
+            "3.52.0" => get_alias!("3.52.0"),
+            "3.52.1" => get_alias!("3.52.1"),
+            "3.52.2" => get_alias!("3.52.2"),
+            "3.52.3" => get_alias!("3.52.3"),
+            "3.53.1" => get_alias!("3.53.1"),
+            "3.89.4" => get_alias!("3.89.4"),
+            "3.96.0" => get_alias!("3.96.0"),
+            "3.98.0" => get_alias!("3.98.0"),
+            "4.8.0" => get_alias!("4.8.0"),
+
             v => {
                 worker::console_warn!("no aliases for version {v}");
                 Ok(None)
@@ -518,11 +580,11 @@ async fn polyfill_sources(
     format: &str,
     version: &str,
 ) -> Result<HashMap<String, Buffer>, BoxError> {
-    let params = feature_names
+    let params_names = feature_names
         .iter()
         .map(|feature_name| format!("/{feature_name}/{format}.js"))
         .collect::<Vec<String>>();
-    let params = serde_json::to_string(&params)?;
+    let params = serde_json::to_string(&params_names)?;
     let params = wasm_bindgen::JsValue::from_str(&params);
 
     for i in 0..D1_RETRIES {
@@ -553,7 +615,10 @@ async fn polyfill_sources(
         }
     }
 
-    Err("failed to retrieve polyfill sources".into())
+    Err(
+        format!("failed to retrieve polyfill sources (version {version} params {params_names:?})")
+            .into(),
+    )
 }
 
 async fn fetch_polyfill_sources(

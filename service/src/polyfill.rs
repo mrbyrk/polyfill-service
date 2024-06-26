@@ -4,12 +4,18 @@ use polyfill_library::{
 };
 use std::sync::Arc;
 
+const SUPPORTED_VERSIONS: &[&str] = &[
+    "3.101.0", "3.103.0", "3.104.0", "3.108.0", "3.109.0", "3.110.1", "3.111.0", "3.27.4",
+    "3.34.0", "3.39.0", "3.40.0", "3.41.0", "3.42.0", "3.46.0", "3.48.0", "3.50.2", "3.51.0",
+    "3.52.0", "3.52.1", "3.52.2", "3.52.3", "3.53.1", "3.89.4", "3.96.0", "3.98.0", "4.8.0",
+];
+
 fn parse_library_version(version: &str) -> Option<String> {
-    return match version {
-        "3.111.0" => Some("3.111.0".to_owned()),
-        "4.8.0" => Some("4.8.0".to_owned()),
-        _ => None,
-    };
+    if SUPPORTED_VERSIONS.contains(&version) {
+        Some(version.to_owned())
+    } else {
+        None
+    }
 }
 
 pub(crate) async fn polyfill(
@@ -24,7 +30,10 @@ pub(crate) async fn polyfill(
             let mut headers = worker::Headers::new();
             headers.set("Cache-Control", "public, s-maxage=31536000, max-age=604800, stale-while-revalidate=604800, stale-if-error=604800, immutable")?;
 
-            return worker::Response::error("requested version does not exist", 400);
+            return worker::Response::error(
+                format!("requested version {} does not exist", parameters.version),
+                400,
+            );
         }
     };
     let version = parameters.version.clone();

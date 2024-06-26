@@ -27,6 +27,8 @@ def generate_version(version):
 
         name = key(file.replace(folder, ""))
 
+        contents = contents.replace("#", "\\\\#")
+
         print("const %s: &str = r#\"%s\"#;" % (name, contents))
 
     print("")
@@ -42,5 +44,29 @@ def generate_version(version):
     print("}")
 
 
+generate_version("3.101.0")
+generate_version("3.103.0")
+generate_version("3.104.0")
+generate_version("3.108.0")
+generate_version("3.109.0")
+generate_version("3.110.1")
 generate_version("3.111.0")
+generate_version("3.27.4")
+generate_version("3.34.0")
+generate_version("3.39.0")
+generate_version("3.40.0")
+generate_version("3.41.0")
+generate_version("3.42.0")
+generate_version("3.46.0")
+generate_version("3.48.0")
+generate_version("3.50.2")
+generate_version("3.51.0")
+generate_version("3.52.0")
+generate_version("3.52.1")
+generate_version("3.52.2")
+generate_version("3.52.3")
+generate_version("3.53.1")
+generate_version("3.89.4")
+generate_version("3.96.0")
+generate_version("3.98.0")
 generate_version("4.8.0")
