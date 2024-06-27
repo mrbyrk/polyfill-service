@@ -10,6 +10,8 @@ pub mod toposort;
 pub mod ua;
 pub mod useragent;
 
+pub(crate) type BoxError = Box<dyn std::error::Error>;
+
 pub struct Env {
     pub polyfill_store: worker::D1Database,
     pub d1_query_metric: prometheus::IntCounterVec,

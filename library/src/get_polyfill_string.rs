@@ -3,7 +3,7 @@ use crate::{
     old_ua::{self, OldUA},
     ua::{UserAgent, UA},
 };
-use crate::{meta, Env};
+use crate::{meta, BoxError, Env};
 use indexmap::IndexSet;
 use std::sync::Arc;
 
@@ -11,8 +11,6 @@ use crate::{polyfill_parameters::PolyfillParameters, toposort::toposort};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::str;
-
-type BoxError = Box<dyn std::error::Error>;
 
 const D1_RETRIES: usize = 10;
 
@@ -195,7 +193,7 @@ enum U {
 }
 
 impl U {
-    fn is_unknown(&self) -> bool {
+    fn is_unknown(&self) -> Result<bool, BoxError> {
         match self {
             Self::Old(u) => u.is_unknown(),
             Self::Current(u) => u.is_unknown(),
@@ -208,7 +206,7 @@ impl U {
             Self::Current(u) => u.get_family(),
         }
     }
-    fn satisfies(&self, range: String) -> bool {
+    fn satisfies(&self, range: String) -> Result<bool, BoxError> {
         match self {
             Self::Old(u) => u.satisfies(range),
             Self::Current(u) => u.satisfies(range),
@@ -265,7 +263,7 @@ fn add_feature(
 fn get_polyfills(
     options: &PolyfillParameters,
     version: &str,
-) -> HashMap<String, FeatureProperties> {
+) -> Result<HashMap<String, FeatureProperties>, BoxError> {
     let ua = if version == "3.25.1" {
         U::Old(old_ua::OldUA::new(&options.ua_string))
     } else {
@@ -329,7 +327,7 @@ fn get_polyfills(
             let mut targeted = feature.flags.contains("always");
 
             if !targeted {
-                let unknown_override = options.unknown == "polyfill" && ua.is_unknown();
+                let unknown_override = options.unknown == "polyfill" && ua.is_unknown()?;
                 if unknown_override {
                     targeted = true;
                     properties.flags.insert("gated".to_string());
@@ -354,9 +352,10 @@ fn get_polyfills(
 
             if !targeted {
                 if let Some(browsers) = meta.browsers {
-                    let is_browser_match = browsers
-                        .get(&ua.get_family())
-                        .map_or(false, |browser| ua.satisfies(browser.to_string()));
+                    let is_browser_match =
+                        browsers.get(&ua.get_family()).map_or(false, |browser| {
+                            ua.satisfies(browser.to_string()).unwrap_or(false)
+                        });
 
                     targeted = is_browser_match;
                 }
@@ -413,7 +412,7 @@ fn get_polyfills(
         }
     }
 
-    targeted_features
+    Ok(targeted_features)
 }
 
 pub async fn get_polyfill_string_stream(
@@ -426,7 +425,8 @@ pub async fn get_polyfill_string_stream(
     let app_version_text = "Polyfill service v".to_owned() + app_version;
     let mut explainer_comment: Vec<String> = vec![];
     // Build a polyfill bundle of polyfill sources sorted in dependency order
-    let mut targeted_features = get_polyfills(options, app_version);
+    let mut targeted_features = get_polyfills(options, app_version)
+        .map_err(|err| format!("failed to get polyfills: {err}"))?;
     let mut warnings: Vec<String> = vec![];
     let mut feature_nodes: Vec<String> = vec![];
     let mut feature_edges: Vec<(String, String)> = vec![];

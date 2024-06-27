@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 use regex::Regex;
-use semver::{VersionReq, Version};
+use semver::{Version, VersionReq};
 use serde::Deserialize;
 
-use crate::{parse::parse, ua::UserAgent};
+use crate::{parse::parse, ua::UserAgent, BoxError};
 
 #[allow(dead_code)]
 #[derive(Deserialize)]
@@ -39,10 +39,7 @@ impl UserAgent for OldUA {
         if let Some(normalized) = re.captures(ua_string) {
             family = normalized.get(1).map(Into::<&str>::into).unwrap().into();
             major = normalized.get(2).map(Into::<&str>::into).unwrap().into();
-            minor = normalized
-                .get(3)
-                .map_or("0", Into::<&str>::into)
-                .to_owned();
+            minor = normalized.get(3).map_or("0", Into::<&str>::into).to_owned();
         } else {
             // Chrome and Opera on iOS uses a UIWebView of the underlying platform to render content. By stripping the CriOS or OPiOS strings, the useragent parser will alias the user agent to ios_saf for the UIWebView, which is closer to the actual renderer
             let ua_string = Regex::new(
@@ -65,7 +62,6 @@ impl UserAgent for OldUA {
             let ua_string = Regex::new(r"(?i) Electron\/[\d.]+\d+")
                 .unwrap()
                 .replace(&ua_string, "");
-
 
             let ua = parse(&ua_string);
             family = ua[0].clone();
@@ -364,20 +360,22 @@ impl UserAgent for OldUA {
         self.family.clone()
     }
 
-    fn satisfies(&self, range: String) -> bool {
-        let req = VersionReq::parse(&range).unwrap();
-        let version = Version::parse(&self.version).unwrap();
-        req.matches(&version)
+    fn satisfies(&self, range: String) -> Result<bool, BoxError> {
+        let req = VersionReq::parse(&range)
+            .map_err(|err| format!("failed to parse version req from range '{range}': {err}"))?;
+        let version = Version::parse(&self.version)
+            .map_err(|err| format!("failed to parse version '{}': {err}", self.version))?;
+        Ok(req.matches(&version))
     }
 
-    fn meets_baseline(&self) -> bool {
+    fn meets_baseline(&self) -> Result<bool, BoxError> {
         let family = &self.family;
         let range = format!(">={}", Self::get_baselines().get(family).unwrap());
         self.satisfies(range)
     }
 
-    fn is_unknown(&self) -> bool {
-        !Self::get_baselines().contains_key(&self.family) || !self.meets_baseline()
+    fn is_unknown(&self) -> Result<bool, BoxError> {
+        Ok(!Self::get_baselines().contains_key(&self.family) || !self.meets_baseline()?)
     }
 
     fn get_baselines() -> HashMap<String, String> {

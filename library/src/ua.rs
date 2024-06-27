@@ -4,14 +4,15 @@ use nodejs_semver::{Range, Version};
 use regex::Regex;
 
 use crate::useragent::useragent;
+use crate::BoxError;
 
 pub trait UserAgent {
     fn new(ua_string: &str) -> Self;
-	fn get_family(&self) -> String;
-	fn satisfies(&self, range: String) -> bool;
-	fn meets_baseline(&self) -> bool;
-	fn is_unknown(&self) -> bool;
-	fn get_baselines() -> HashMap<String, String>;
+    fn get_family(&self) -> String;
+    fn satisfies(&self, range: String) -> Result<bool, BoxError>;
+    fn meets_baseline(&self) -> Result<bool, BoxError>;
+    fn is_unknown(&self) -> Result<bool, BoxError>;
+    fn get_baselines() -> HashMap<String, String>;
 }
 
 /// JavaScript's
@@ -37,10 +38,7 @@ impl UserAgent for UA {
             // println!("normalized: {:#?}", normalized);
             family = normalized.get(1).map(Into::<&str>::into).unwrap().into();
             major = normalized.get(2).map(Into::<&str>::into).unwrap().into();
-            minor = normalized
-                .get(3)
-                .map_or("0", Into::<&str>::into)
-                .to_owned();
+            minor = normalized.get(3).map_or("0", Into::<&str>::into).to_owned();
         } else {
             // Google Search iOS app should be detected as the underlying browser, which is safari on iOS
             let ua_string = Regex::new(r"(?i) GSA\/[\d.]+")
@@ -494,7 +492,8 @@ impl UserAgent for UA {
             || (family == "ios_chr" && major.parse::<u64>().unwrap_or(0) >= 9)
             || (family == "firefox" && major.parse::<u64>().unwrap_or(0) >= 38)
             || (family == "firefox_mob" && major.parse::<u64>().unwrap_or(0) >= 38)
-            || (family == "android" && format!("{major}.{minor}").parse::<f64>().unwrap_or(0.0) >= 4.3)
+            || (family == "android"
+                && format!("{major}.{minor}").parse::<f64>().unwrap_or(0.0) >= 4.3)
             || (family == "opera" && major.parse::<u64>().unwrap_or(0) >= 33)
             || (family == "op_mob" && major.parse::<u64>().unwrap_or(0) >= 10)
             || (family == "op_mini" && major.parse::<u64>().unwrap_or(0) >= 5)
@@ -508,54 +507,51 @@ impl UserAgent for UA {
             minor = "0".to_owned();
         }
 
-		let mut major: u64 = major.parse().unwrap_or(0);
-		let mut minor: u64 = minor.parse().unwrap_or(0);
+        let mut major: u64 = major.parse().unwrap_or(0);
+        let mut minor: u64 = minor.parse().unwrap_or(0);
 
-		if major > MAX_SAFE_INTEGER {
-			major = MAX_SAFE_INTEGER;
-		}
+        if major > MAX_SAFE_INTEGER {
+            major = MAX_SAFE_INTEGER;
+        }
 
-		if minor > MAX_SAFE_INTEGER {
-			minor = MAX_SAFE_INTEGER;
-		}
+        if minor > MAX_SAFE_INTEGER {
+            minor = MAX_SAFE_INTEGER;
+        }
 
         let version = format!("{major}.{minor}.0");
 
         // println!("ua norm: {}/{}", family, version);
-        Self {
-            version,
-            family,
-        }
+        Self { version, family }
     }
 
     fn get_family(&self) -> String {
         self.family.clone()
     }
 
-    fn satisfies(&self, range: String) -> bool {
-        let req: Range = range.parse().unwrap_or_else(|_| panic!("err: {}", range));
+    fn satisfies(&self, range: String) -> Result<bool, BoxError> {
+        let req: Range = range
+            .parse()
+            .map_err(|err| format!("failed to parse version range '{range}': {err}"))?;
         let version: Version = self
             .version
             .parse()
-            .unwrap_or_else(|_| panic!("err: {}", self.version));
-        // println!("req: {:#?}", req);
-        // println!("version: {:#?}", version);
-        version.satisfies(&req)
+            .map_err(|err| format!("failed to parse version '{}': {err}", self.version))?;
+        Ok(version.satisfies(&req))
     }
 
-    fn meets_baseline(&self) -> bool {
+    fn meets_baseline(&self) -> Result<bool, BoxError> {
         let family = &self.family;
         match Self::get_baselines().get(family) {
             Some(family) => {
                 let range = format!(">={family}");
                 self.satisfies(range)
             }
-            None => false,
+            None => Ok(false),
         }
     }
 
-    fn is_unknown(&self) -> bool {
-        !Self::get_baselines().contains_key(&self.family) || !self.meets_baseline()
+    fn is_unknown(&self) -> Result<bool, BoxError> {
+        Ok(!Self::get_baselines().contains_key(&self.family) || !self.meets_baseline()?)
     }
 
     fn get_baselines() -> HashMap<String, String> {
