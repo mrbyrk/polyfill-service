@@ -8,6 +8,6 @@
 
 ## Polyfill.io now available on cdnjs
 
-Start using the service: https://cdnjs.cloudflare.com/polyfill
+Start using the service: <https://cdnjs.cloudflare.com/polyfill>
 
-See the announcement from Cloudflare: https://blog.cloudflare.com/polyfill-io-now-available-on-cdnjs-reduce-your-supply-chain-risk.
+See the announcements from Cloudflare: <https://blog.cloudflare.com/polyfill-io-now-available-on-cdnjs-reduce-your-supply-chain-risk> + <https://blog.cloudflare.com/automatically-replacing-polyfill-io-links-with-cloudflares-mirror-for-a-safer-internet>.
