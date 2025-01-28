@@ -6,3 +6,7 @@ members = [
 
 [profile.release]
 debug = true
+
+[workspace.dependencies]
+worker = { version = "0.5", features = ["d1"] }
+wasm-bindgen = "0.2"
