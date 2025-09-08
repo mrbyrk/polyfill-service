@@ -30,10 +30,13 @@ pub fn get_polyfill_parameters(request: &worker::Request) -> PolyfillParameters 
     let excludes = query.get("excludes").map_or_else(String::new, |f| {
         decode(f).map_or_else(|_| f.to_string(), |f| f.to_string())
     });
-    let features = query.get("features").map_or_else(
-        || "default".to_owned(),
-        |f| decode(f).map_or_else(|_| f.to_string(), |f| f.to_string()),
-    );
+    let features = query
+        .get("features")
+        .filter(|v| Regex::new(r"^[0-9a-zA-Z-_.@~]+$").unwrap().is_match(v))
+        .map_or_else(
+            || "default".to_owned(),
+            |f| decode(f).map_or_else(|_| f.to_string(), |f| f.to_string()),
+        );
     let unknown = query
         .get("unknown")
         .map_or_else(|| "polyfill".to_owned(), std::clone::Clone::clone);
