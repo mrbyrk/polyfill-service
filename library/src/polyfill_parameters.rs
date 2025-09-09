@@ -32,7 +32,7 @@ pub fn get_polyfill_parameters(request: &worker::Request) -> PolyfillParameters 
     });
     let features = query
         .get("features")
-        .filter(|v| Regex::new(r"^[0-9a-zA-Z-_.@~]+$").unwrap().is_match(v))
+        .filter(|v| Regex::new(r"^[0-9a-zA-Z-_.@~,]+$").unwrap().is_match(v))
         .map_or_else(
             || "default".to_owned(),
             |f| decode(f).map_or_else(|_| f.to_string(), |f| f.to_string()),
